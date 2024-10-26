@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;  
+
+html, body {
+  margin: 0px;
+}
+
+html, body, #root {
+  width: 100%;
+  min-height: 100vh;
+  height: auto;
+}
+
+code {
+  padding: 2px;
+  background-color: rgb(79, 76, 76);
+  color: white;
+  border-radius: 5px;
+}
