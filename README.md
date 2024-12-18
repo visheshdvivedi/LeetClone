@@ -2,6 +2,19 @@
 
 A fully functional LeetCode-inspired platform for coding challenges, built with React and Django. This web application allows users to create accounts, solve programming problems, and track their progress through personal profiles.
 
+## Screenshots
+### Landing Page
+![Landing Page](https://github.com/visheshdvivedi/LeetClone/blob/main/screenshots/LeetClone%20Landing%20Page.png?raw=true)
+
+### Dashboard Page
+![Dashboard Page](https://github.com/visheshdvivedi/LeetClone/blob/main/screenshots/LeetClone%20User%20Dashboard%20Page.png?raw=true)
+
+### Problem Page
+![Problem Page](https://github.com/visheshdvivedi/LeetClone/blob/main/screenshots/LeetClone%20Problems%20Page.png?raw=true)
+
+### Profile Page
+![Profile Page](https://github.com/visheshdvivedi/LeetClone/blob/main/screenshots/LeetClone%20Profile%20Page.png?raw=true)
+
 ## Features
 
 - **User Authentication**: Secure login and registration system.
