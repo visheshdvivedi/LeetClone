@@ -90,9 +90,6 @@ DATABASES = {
         'PASSWORD': getenv('PGPASSWORD'),
         'HOST': getenv('PGHOST'),
         'PORT': getenv('PGPORT', 5432),
-        'OPTIONS': {
-            'sslmode': 'require',
-        },
     }
 }
 
@@ -180,7 +177,3 @@ GOOGLE_OAUTH_BACKEND_REDIRECT_URL = os.environ.get("GOOGLE_OAUTH_BACKEND_REDIREC
 GOOGLE_OAUTH_FRONTEND_REDIRECT_URL = os.environ.get("GOOGLE_OAUTH_FRONTEND_REDIRECT_URL")
 
 JUDGE_URL = os.environ.get("JUDGE_URL")
-
-STORAGE_ACCOUNT_URL = os.environ.get("STORAGE_ACCOUNT_URL")
-STORAGE_CONN_STRING = os.environ.get("STORAGE_CONN_STRING")
-STORAGE_CONTAINER_NAME = os.environ.get("STORAGE_CONTAINER_NAME")

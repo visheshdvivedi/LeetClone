@@ -1,6 +1,7 @@
 import time
 import base64
-from http import HTTPMethod, HTTPStatus
+
+from rest_framework import status
 
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
@@ -39,16 +40,16 @@ class ProblemViewSet(ViewSet):
             if not isinstance(problem, Problem):
                 return Response({"message": problem})
             return Response({"id": problem.public_id, "message": "Problem created successfully"}, status=201)
-        return Response(serializer.errors, status=HTTPStatus.BAD_REQUEST)
+        return Response(serializer.errors, status=status.BAD_REQUEST)
     
     # cache response for 24 hours
     def retrieve(self, request, pk=None):
         if not pk:
-            return Response({"message": "Invalid problem ID"}, status=HTTPStatus.BAD_REQUEST)
+            return Response({"message": "Invalid problem ID"}, status=status.BAD_REQUEST)
 
         problem = Problem.objects.filter(published=True, public_id=pk).first()
         if not problem:
-            return Response({"message": "Invalid problem ID"}, status=HTTPStatus.BAD_REQUEST)
+            return Response({"message": "Invalid problem ID"}, status=status.BAD_REQUEST)
 
         serializer = RetrieveProblemSerializer(problem)
         data = serializer.data
@@ -81,13 +82,13 @@ class ProblemViewSet(ViewSet):
         serializer = ListProblemSerializer(problems, many=True)
         return Response(serializer.data)
     
-    @action(detail=False, methods=[HTTPMethod.GET])
+    @action(detail=False, methods=['GET'])
     def list_all_tags(self, request):
         tags = Tag.objects.all()
         serializer = TagSerializer(tags, many=True)
         return Response(serializer.data)
     
-    @action(detail=True, methods=[HTTPMethod.PUT])
+    @action(detail=True, methods=['PUT'])
     def vote(self, request, pk=None):
         serializer = VoteSerializer(data=request.data)
         if serializer.is_valid():
@@ -95,10 +96,10 @@ class ProblemViewSet(ViewSet):
 
             problem = Problem.objects.filter(public_id=pk, published=True).first()
             if not problem:
-                return Response({"message": "Invalid problem ID"}, status=HTTPStatus.BAD_REQUEST)
+                return Response({"message": "Invalid problem ID"}, status=status.BAD_REQUEST)
             
             if vote_type not in [0, 1]:
-                return Response({"message": "Invalid vote ID"}, status=HTTPStatus.BAD_REQUEST)
+                return Response({"message": "Invalid vote ID"}, status=status.BAD_REQUEST)
             
             if vote_type == 0:
                 problem.likes += 1
@@ -108,9 +109,9 @@ class ProblemViewSet(ViewSet):
 
             return Response({"message": "Vote submitted successfully"})
 
-        return Response(serializer.errors, status=HTTPStatus.BAD_REQUEST)
+        return Response(serializer.errors, status=status.BAD_REQUEST)
     
-    @action(detail=True, methods=[HTTPMethod.POST])
+    @action(detail=True, methods=['POST'])
     def run(self, request, pk=None):
         serializer = RunSerializer(data=request.data)
         if serializer.is_valid():
@@ -122,12 +123,12 @@ class ProblemViewSet(ViewSet):
             # check if language id is valid or not
             language = Language.objects.filter(public_id=language_id).first()
             if not language:
-                return Response({"message", "Invalid language ID"}, status=HTTPStatus.BAD_REQUEST)
+                return Response({"message", "Invalid language ID"}, status=status.BAD_REQUEST)
             
             # check if problem id is valid or not
             problem = Problem.objects.filter(public_id=pk, published=True).first()
             if not problem:
-                return Response({"message": "Invalid problem ID"}, status=HTTPStatus.BAD_REQUEST)
+                return Response({"message": "Invalid problem ID"}, status=status.BAD_REQUEST)
             
             # add stdin and stdout code
             code = base64.b64decode(code).decode('utf-8')
@@ -137,14 +138,14 @@ class ProblemViewSet(ViewSet):
             count = problem.testcases.filter(is_sample=True).count()
             status, response = JUDGE_MANAGER.create_batch(codes=codes, language=language.judge_id)
             if not status:
-                return Response({"message": str(response)}, status=HTTPStatus.BAD_REQUEST)
+                return Response({"message": str(response)}, status=status.BAD_REQUEST)
             
             tokens = [entry['token'] for entry in response]
             while True:
 
                 status, response = JUDGE_MANAGER.get_batch(tokens)
                 if not status:
-                    return Response({"message": str(response)}, status=HTTPStatus.BAD_REQUEST)
+                    return Response({"message": str(response)}, status=status.BAD_REQUEST)
                 
                 loop_state = False
                 for entry in response['submissions']:
@@ -163,21 +164,21 @@ class ProblemViewSet(ViewSet):
 
                 return Response(response)
                 
-        return Response(serializer.errors, status=HTTPStatus.BAD_REQUEST)
+        return Response(serializer.errors, status=status.BAD_REQUEST)
     
-    @action(detail=True, methods=[HTTPMethod.GET])
+    @action(detail=True, methods=['GET'])
     def submissions(self, request, pk=None):
 
         # check if problem id is valid or not
         problem = Problem.objects.filter(public_id=pk, published=True).first()
         if not problem:
-            return Response({"message": "Invalid problem ID"}, status=HTTPStatus.BAD_REQUEST)
+            return Response({"message": "Invalid problem ID"}, status=status.BAD_REQUEST)
         
         submissions = Submission.objects.filter(problem=problem).order_by('-date').all()
         serializer = SubmissionSerializer(submissions, many=True)
         return Response(serializer.data, status=200)
     
-    @action(detail=True, methods=[HTTPMethod.POST])
+    @action(detail=True, methods=['POST'])
     def submit(self, request, pk=None):
         serializer = RunSerializer(data=request.data)
         if serializer.is_valid():
@@ -189,12 +190,12 @@ class ProblemViewSet(ViewSet):
             # check if language id is valid or not
             language = Language.objects.filter(public_id=language_id).first()
             if not language:
-                return Response({"message", "Invalid language ID"}, status=HTTPStatus.BAD_REQUEST)
+                return Response({"message", "Invalid language ID"}, status=status.BAD_REQUEST)
             
             # check if problem id is valid or not
             problem = Problem.objects.filter(public_id=pk, published=True).first()
             if not problem:
-                return Response({"message": "Invalid problem ID"}, status=HTTPStatus.BAD_REQUEST)
+                return Response({"message": "Invalid problem ID"}, status=status.BAD_REQUEST)
             
             # add stdin and stdout code
             code = base64.b64decode(code).decode('utf-8')
@@ -203,14 +204,14 @@ class ProblemViewSet(ViewSet):
             # run code
             status, response = JUDGE_MANAGER.create_batch(codes=codes, language=language.judge_id)
             if not status:
-                return Response({"message": str(response)}, status=HTTPStatus.BAD_REQUEST)
+                return Response({"message": str(response)}, status=status.BAD_REQUEST)
             
             tokens = [entry['token'] for entry in response]
             while True:
 
                 status, response = JUDGE_MANAGER.get_batch(tokens)
                 if not status:
-                    return Response({"message": str(response)}, status=HTTPStatus.BAD_REQUEST)
+                    return Response({"message": str(response)}, status=status.BAD_REQUEST)
                 
                 loop_state = False
                 for entry in response['submissions']:

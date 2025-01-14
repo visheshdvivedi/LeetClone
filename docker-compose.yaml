@@ -1,0 +1,54 @@
+services:
+  nginx:
+    image: nginx:1-alpine
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+
+  backend:
+    build:
+      context: ./backend
+    container_name: backend
+    environment:
+      GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
+      GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
+      GOOGLE_OAUTH_BACKEND_REDIRECT_URL: ${GOOGLE_OAUTH_BACKEND_REDIRECT_URL}
+      GOOGLE_OAUTH_FRONTEND_REDIRECT_URL: ${GOOGLE_OAUTH_FRONTEND_REDIRECT_URL}
+      JUDGE_URL: ${JUDGE_URL}
+      PGDATABASE: leetclonedb
+      PGHOST: postgres
+      PGPASSWORD: Password@123!
+      PGPORT: 5432
+      PGUSER: postgresadmin
+    ports:
+      - "8000:8000"
+    volumes:
+      - "./backend:/usr/src/app"
+        
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend
+    ports:
+      - "3000:3000"
+
+  postgres:
+    image: postgres:15
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: Password@123!
+      POSTGRES_USER: postgresadmin
+      POSTGRES_DB: leetclonedb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "leetclonedb"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
+
+volumes:
+  postgres_data:
